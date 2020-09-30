@@ -2,7 +2,9 @@
 
 An R package with various functions to study urban change. So far, this package contains the fillowing: 
 
-1. `nrt`: Neighborhood Racial Typologies
+1. `nt`: Neighborhood Racial Typologies
+2. `ntdf`: create the dataframe for nt
+3. `ntcheck`: identify counts that can be concatenated
 
 ```
 #### example
