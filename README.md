@@ -4,6 +4,7 @@ An R package with various functions to study urban change. So far, this package 
 
 1. `nrt`: Neighborhood Racial Typologies
 
+```
 #### example
 # Baltimore_nt <- ntdf(state = "MD", county = "Baltimore City", geometry = TRUE)
 # cal <- ntdf(state = "CA")
@@ -36,4 +37,4 @@ An R package with various functions to study urban change. So far, this package 
 # ntcheck(cal)
 # ntcheck(ny)
 # ntcheck(ps_nt)
-
+```
