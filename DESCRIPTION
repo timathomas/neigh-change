@@ -1,18 +1,14 @@
-Package: urbandemograhics
-Title: Urban demographic analysis
-Version: 0.0.1
-Authors@R: 
-    person(given = "Tim",
-           family = "Thomas",
-           role = c("aut", "cre"),
-           email = "timthomas@berkeley.edu",
-           comment = c(ORCID = "0000-0003-1357-6095"))
-Description: This package features several urban demographic functions in relation to racial segregation, housing market trends, and mobility. 
-License: `use_mit_license()`
+Package: urbandemographics
+Type: Package
+Title: Create neighborhood racial typologies
+Version: 0.1.0
+Author: tim thomas
+Maintainer: The package maintainer <timthomas@berkeley.edu>
+Description: This package features several urban demographic functions in 
+    relation to racial segregation, housing market trends, and mobility. 
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
 Imports: 
-    tidyverse, 
-    tidycensus
+    tidycensus, 
+    dplyr

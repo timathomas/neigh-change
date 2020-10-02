@@ -1,75 +1,29 @@
 # ==========================================================================
-# Neighborhood typology data frame
-# ==========================================================================
-
-ntdf <- function(state, geography = "tract", county = NULL, geometry = FALSE, cache_table = TRUE, output = "wide", year = 2018){
-
-	library(tidycensus)
-	library(tidyverse)
-race_vars <-
-	c('totrace' = 'B03002_001',
-	  'White' = 'B03002_003',
-	  'Black' = 'B03002_004',
-	  'Asian' = 'B03002_006',
-	  'Latinx' = 'B03002_012')
-
-acs_data <-
-	get_acs(
-		geography = geography,
-		variables = race_vars,
-		state = state,
-		county = county,
-		geometry = geometry,
-		cache_table = cache_table,
-		output = output,
-		year = year,
-		cb = TRUE
-		) %>%
-	select(-ends_with("M")) %>%
-	group_by(GEOID) %>%
-	mutate(pWhite = WhiteE/totraceE,
-		   pAsian = AsianE/totraceE,
-		   pBlack = BlackE/totraceE,
-		   pLatinx = LatinxE/totraceE,
-		   pOther = (totraceE - sum(WhiteE, AsianE, BlackE, LatinxE, na.rm = TRUE))/totraceE)
-
- nt(df = acs_data)
-
-}
-
-# ==========================================================================
-# Neighborhood Typology formula
-# ==========================================================================
-
-# ==========================================================================
 # Neighborhood Typology
 # By: Tim Thomas - timothyathomas@gmail.com
 # Measures drawn from:
-# 	Hall, Matthew, Kyle Crowder, and Amy Spring. 2015. “Neighborhood 
-# 		Foreclosures, Racial/Ethnic Transitions, and Residential 
+# 	Hall, Matthew, Kyle Crowder, and Amy Spring. 2015. “Neighborhood
+# 		Foreclosures, Racial/Ethnic Transitions, and Residential
 # 		Segregation.” American Sociological Review 80:526–549.
-# 
+#
 # Process:
-# 	1. Create a dataframe with the proportions for White, Black, Asian, 
-# 		Latinx, and Other. 
+# 	1. Create a dataframe with the proportions for White, Black, Asian,
+# 		Latinx, and Other.
 # 	2. Run the `nt` function on that dataset to create a `NeighType` field
 # 	3. Look at your neighborhood typology frequency and consider merging
-# 		similar, or low frequency, neighborhoods into one or more common 
+# 		similar, or low frequency, neighborhoods into one or more common
 # 		categories (e.g., some of the four category cases could be considered
-# 		white-mixed--see the article to see how the authors consolidated 
+# 		white-mixed--see the article to see how the authors consolidated
 # 		categories).
 # ==========================================================================
 
-nt <- function(df, pWhite = "pWhite", pBlack = "pBlack", pAsian = "pAsian", pLatinx = "pLatinx", pOther = "pOther"){
-
-	if (!require("pacman")) install.packages("pacman")
-	pacman::p_load(tidyverse)
+nt <- function(df, GEOID = "GEOID", totraceE = "toteraceE", pWhite = "pWhite", pBlack = "pBlack", pAsian = "pAsian", pLatinx = "pLatinx", pOther = "pOther"){
 
 	df %>%
-	group_by(GEOID) %>%
+	dplyr::group_by(GEOID) %>%
 			# create neighborhood typology
-	mutate(NeighType =
-		case_when(
+	dplyr::mutate(NeighType =
+		dplyr::case_when(
 			pWhite >=.9 ~ "All White",
 			pBlack >=.9 ~ "All Black",
 			pAsian >=.9 ~ "All Asian",
@@ -98,7 +52,7 @@ nt <- function(df, pWhite = "pWhite", pBlack = "pBlack", pAsian = "pAsian", pLat
 			pAsian >=.1 & pAsian < .9 & pBlack >=.1 & pBlack < .9 & pWhite < .1 & pLatinx < .1 & pOther < .1 ~ "Asian-Black",
 			pAsian >=.1 & pAsian < .9 & pLatinx >=.1 & pLatinx < .9 & pWhite < .1 & pBlack < .1 & pOther < .1 ~ "Asian-Latinx",
 			pAsian >= .1 & pAsian < .9 & pOther >=.1 & pOther < .9 & pWhite < .1 & pLatinx < .1 & pBlack < .1 ~ "Asian-Other",
-			
+
 			pLatinx >= .1 & pLatinx < .9 & pOther >=.1 & pOther < .9 & pWhite < .1 & pAsian < .1 & pBlack < .1 ~ "Latinx-Other",
 
 			pBlack >=.1 & pAsian >=.1 & pLatinx >=.1 & pWhite < .1 & pOther < .1 ~ "Black-Asian-Latinx",
@@ -121,14 +75,7 @@ nt <- function(df, pWhite = "pWhite", pBlack = "pBlack", pAsian = "pAsian", pLat
 			pWhite >=.1 & pBlack >=.1 & pAsian >=.1 & pOther >=.1 & pLatinx < .1 ~ "White-Black-Asian-Other",
 			pWhite >=.1 & pBlack >=.1 & pAsian >=.1 & pLatinx >=.1 & pOther < .1 ~ "White-Black-Asian-Latinx",
 
-			pWhite >.1 & pWhite <=.7 & pBlack >.1 & pAsian >.1 & pLatinx >.1 & pOther >.1 ~ "Diverse", 
-			totraceE == 0 ~ "unpopulated tract")) %>% 
-		ungroup()
+			pWhite >.1 & pWhite <=.7 & pBlack >.1 & pAsian >.1 & pLatinx >.1 & pOther >.1 ~ "Diverse",
+			totraceE == 0 ~ "unpopulated tract")) %>%
+		dplyr::ungroup()
 	}
-
-# ==========================================================================
-# Neighborhood typology check
-# ==========================================================================
-
-ntcheck <- function(df) 
-	df %>% group_by(NeighType) %>% count() %>% arrange(desc(n)) %>% data.frame()
