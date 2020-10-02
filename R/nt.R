@@ -116,7 +116,8 @@ nt <- function(
 				NeighType == "Black-Shared" ~ "Mostly Black",
 				NeighType == "Asian-Shared" ~ "Mostly Asian",
 				NeighType == "Latinx-Shared" ~ "Mostly Latinx",
-				NeighType == "Other-Shared" ~ "Mostly Other"
+				NeighType == "Other-Shared" ~ "Mostly Other", 
+				TRUE ~ NeighType
 			)
 		)
 	}
