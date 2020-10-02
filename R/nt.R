@@ -17,7 +17,18 @@
 # 		categories).
 # ==========================================================================
 
-nt <- function(df, GEOID = "GEOID", totraceE = "toteraceE", pWhite = "pWhite", pBlack = "pBlack", pAsian = "pAsian", pLatinx = "pLatinx", pOther = "pOther"){
+nt <- function(
+	df, 
+	GEOID = "GEOID", 
+	totraceE = "toteraceE", 
+	pWhite = "pWhite", 
+	pBlack = "pBlack", 
+	pAsian = "pAsian", 
+	pLatinx = "pLatinx", 
+	pOther = "pOther", 
+	NeighType = "NeighType",
+	nt_conc = "nt_conc"
+	){
 
 	df %>%
 	dplyr::group_by(GEOID) %>%
@@ -76,6 +87,36 @@ nt <- function(df, GEOID = "GEOID", totraceE = "toteraceE", pWhite = "pWhite", p
 			pWhite >=.1 & pBlack >=.1 & pAsian >=.1 & pLatinx >=.1 & pOther < .1 ~ "White-Black-Asian-Latinx",
 
 			pWhite >.1 & pWhite <=.7 & pBlack >.1 & pAsian >.1 & pLatinx >.1 & pOther >.1 ~ "Diverse",
-			totraceE == 0 ~ "unpopulated tract")) %>%
-		dplyr::ungroup()
+			totraceE == 0 ~ "Unpopulated Tract")) %>%
+		dplyr::ungroup() %>% 
+		dplyr::mutate(nt_conc = 
+			dplyr::case_when(
+				NeighType == "Black-Asian-Latinx-Other" ~ "4 Group Mixed", 
+				NeighType == "White-Asian-Latinx-Other" ~ "4 Group Mixed", 
+				NeighType == "White-Black-Latinx-Other" ~ "4 Group Mixed", 
+				NeighType == "White-Black-Asian-Other" ~ "4 Group Mixed", 
+				NeighType == "White-Black-Asian-Latinx" ~ "4 Group Mixed", 
+				NeighType == "Black-Asian-Latinx" ~ "3 Group Mixed",
+				NeighType == "Black-Asian-Other" ~ "3 Group Mixed",
+				NeighType == "Black-Latinx-Other" ~ "3 Group Mixed",
+				NeighType == "Asian-Latinx-Other" ~ "3 Group Mixed",
+				NeighType == "White-Black-Asian" ~ "3 Group Mixed",
+				NeighType == "White-Black-Latinx" ~ "3 Group Mixed",
+				NeighType == "White-Black-Other" ~ "3 Group Mixed",
+				NeighType == "White-Asian-Latinx" ~ "3 Group Mixed",
+				NeighType == "White-Asian-Other" ~ "3 Group Mixed",
+				NeighType == "White-Latinx-Other" ~ "3 Group Mixed",
+				NeighType == "White-Latinx-Other" ~ "3 Group Mixed",
+				NeighType == "All White" ~ "Mostly White",
+				NeighType == "All Black" ~ "Mostly Black",
+				NeighType == "All Asian" ~ "Mostly Asian",
+				NeighType == "All Latinx" ~ "Mostly Latinx",
+				NeighType == "All Other" ~ "Mostly Other",
+				NeighType == "White-Shared" ~ "Mostly White",
+				NeighType == "Black-Shared" ~ "Mostly Black",
+				NeighType == "Asian-Shared" ~ "Mostly Asian",
+				NeighType == "Latinx-Shared" ~ "Mostly Latinx",
+				NeighType == "Other-Shared" ~ "Mostly Other"
+			)
+		)
 	}
